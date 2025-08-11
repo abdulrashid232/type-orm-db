@@ -4,6 +4,7 @@ import { UpdateItemDto } from './dto/update-item.dto';
 import { EntityManager, Repository } from 'typeorm';
 import { Item } from './entities/item.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Listing } from './entities/listing.entity';
 
 @Injectable()
 export class ItemsService {
@@ -14,7 +15,11 @@ export class ItemsService {
   ) {}
 
   async create(createItemDto: CreateItemDto) {
-    const item = new Item(createItemDto);
+    const listing = new Listing({
+      ...createItemDto.listing,
+      rating: 0,
+    });
+    const item = new Item({ ...createItemDto, listing });
     await this.entityManager.save(item);
     return item;
   }
@@ -24,7 +29,10 @@ export class ItemsService {
   }
 
   async findOne(id: number) {
-    const item = await this.itemRepository.findOneBy({ id });
+    const item = await this.itemRepository.findOne({
+      where: { id },
+      relations: ['listing'],
+    });
     if (!item) {
       throw new NotFoundException(`Item with ID ${id} not found`);
     }
