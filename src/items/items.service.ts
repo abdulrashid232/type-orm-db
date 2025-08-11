@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { EntityManager, Repository } from 'typeorm';
@@ -16,6 +16,7 @@ export class ItemsService {
   async create(createItemDto: CreateItemDto) {
     const item = new Item(createItemDto);
     await this.entityManager.save(item);
+    return item;
   }
 
   async findAll() {
@@ -23,14 +24,26 @@ export class ItemsService {
   }
 
   async findOne(id: number) {
-    return await this.itemRepository.findOneBy({ id });
+    const item = await this.itemRepository.findOneBy({ id });
+    if (!item) {
+      throw new NotFoundException(`Item with ID ${id} not found`);
+    }
+    return item;
   }
 
   async update(id: number, updateItemDto: UpdateItemDto) {
-    return await this.itemRepository.update(id, updateItemDto);
+    const item = await this.itemRepository.findOneBy({ id });
+    if (!item) {
+      throw new NotFoundException(`Item with ID ${id} not found`);
+    }
+    return await this.itemRepository.save({ ...item, ...updateItemDto });
   }
 
   async remove(id: number) {
-    return await this.itemRepository.delete(id);
+    const item = await this.itemRepository.findOneBy({ id });
+    if (!item) {
+      throw new NotFoundException(`Item with ID ${id} not found`);
+    }
+    return await this.itemRepository.remove(item);
   }
 }
