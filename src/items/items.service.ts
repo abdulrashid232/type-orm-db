@@ -50,19 +50,23 @@ export class ItemsService {
   }
 
   async update(id: number, updateItemDto: UpdateItemDto) {
-    const item = await this.itemRepository.findOneBy({ id });
-    if (!item) {
-      throw new NotFoundException(`Item with ID ${id} not found`);
-    }
+    await this.entityManager.transaction(async (entityManager) => {
+      const item = await this.itemRepository.findOneBy({ id });
+      if (!item) {
+        throw new NotFoundException(`Item with ID ${id} not found`);
+      }
+      const newComments = updateItemDto.comments?.map(
+        (comment) => new Comment({ content: comment }),
+      );
 
-    const newComments = updateItemDto.comments?.map(
-      (comment) => new Comment({ content: comment }),
-    );
+      item.comments = newComments || item.comments;
+      item.name = updateItemDto.name || item.name;
+      item.public = updateItemDto.public ?? item.public;
 
-    return await this.itemRepository.save({
-      ...item,
-      ...updateItemDto,
-      comments: newComments,
+      await entityManager.save(item);
+      const tagContent = `${Math.random().toString(36).substring(2, 15)}`;
+      const tag = new Tag({ content: tagContent });
+      await entityManager.save(tag);
     });
   }
 
