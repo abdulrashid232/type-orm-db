@@ -8,9 +8,9 @@ import {
   OneToOne,
 } from 'typeorm';
 import { Listing } from './listing.entity';
-import { AbstractEntity } from 'src/database/abstract.entity';
 import { Comment } from './comments.entity';
 import { Tag } from './tag.entity';
+import { AbstractEntity } from './abstract.entity';
 
 @Entity()
 export class Item extends AbstractEntity<Item> {
