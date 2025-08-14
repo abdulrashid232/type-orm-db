@@ -99,4 +99,24 @@ describe('ItemsService', () => {
       expect(await service.findAll()).toEqual(result);
     });
   });
+
+  describe('findOne', () => {
+    it('should return a single item', async () => {
+      const result = {
+        id: 1,
+        name: 'Test Item',
+        listing: {
+          id: 1,
+          description: 'Test Description',
+          rating: 5,
+        },
+        comments: [],
+        tags: [],
+        public: true,
+      };
+      jest.spyOn(service, 'findOne').mockResolvedValue(result);
+
+      expect(await service.findOne(1)).toEqual(result);
+    });
+  });
 });
