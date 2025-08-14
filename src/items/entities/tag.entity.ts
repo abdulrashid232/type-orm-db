@@ -1,5 +1,5 @@
 import { Column, Entity } from 'typeorm';
-import { AbstractEntity } from '../../database/abstract.entity';
+import { AbstractEntity } from './abstract.entity';
 
 @Entity()
 export class Tag extends AbstractEntity<Tag> {
