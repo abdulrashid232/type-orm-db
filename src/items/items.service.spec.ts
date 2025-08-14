@@ -119,4 +119,32 @@ describe('ItemsService', () => {
       expect(await service.findOne(1)).toEqual(result);
     });
   });
+
+  describe('update', () => {
+    it('should update an item', async () => {
+      const itemData: CreateItemDto = {
+        name: 'Updated Item',
+        listing: {
+          description: 'Updated Description',
+          rating: 4,
+        },
+        comments: [],
+        tags: [],
+        public: true,
+      };
+
+      jest.spyOn(service, 'update').mockResolvedValue({
+        id: 1,
+        ...itemData,
+        public: true,
+      } as unknown as void);
+
+      const result = await service.update(1, itemData);
+      expect(result).toEqual({
+        id: 1,
+        ...itemData,
+        public: true,
+      });
+    });
+  });
 });
